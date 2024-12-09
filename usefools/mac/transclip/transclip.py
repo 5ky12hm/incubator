@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import os
 import time
 import pyperclip
@@ -8,7 +6,9 @@ from AppKit import NSWorkspace
 
 
 class Transclip:
-    allow_appnames = ["wezterm"]
+    allow_appnames = [
+        "WezTerm",
+    ]
     srcLang = "en"
     destLang = "ja"
 
@@ -37,13 +37,14 @@ class Transclip:
                 continue
 
             detected = translator.detect(sentence)
-            if detected != self.srcLang:
+            if detected.lang != self.srcLang:
+                print(detected)
                 continue
 
             translated = translator.translate(
                 sentence, src=self.srcLang, dest=self.destLang).text
 
-            os.system(f"osascript -e 'display dialog \"{translated}\"'")
+            os.system(f"osascript -e 'display notification \"{translated}\"'")
 
 
 if __name__ == "__main__":
