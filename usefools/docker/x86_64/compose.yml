@@ -1,0 +1,38 @@
+services:
+  debian:
+    image: debian:bookworm-slim
+    platform: linux/x86_64
+    container_name: debian
+    privileged: true
+    # security_opt:
+    #   - seccomp:unconfined
+    # cap_add:
+    #   - SYS_PTRACE
+    #   - SYS_ADMIN
+    command: >
+      /bin/sh -c '
+        apt-get -y update &&
+        apt-get -y upgrade &&
+
+        groupadd -g 100 users -f &&
+        useradd -g users -u 1001 5ky12hm &&
+
+        apt-get -y install zsh &&
+
+        # commented out: cannot pwndbg with rosetta debug server
+        # apt-get -y install gdb curl wget xz-utils &&
+        # curl -qsL "https://install.pwndbg.re" | sh -s -- -t pwndbg-gdb &&
+
+        apt-get -y install gdb &&
+        # commented out: cannot gef with rosetta debug server
+        # apt-get -y install python3 binutils file procps &&
+        echo 0 > /proc/sys/kernel/yama/ptrace_scope &&
+
+        apt-get -y install binutils file procps gcc &&
+
+        tail -F /dev/null
+      '
+    volumes:
+      # - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - ~:/home/5ky12hm
+      - /mnt/share:/mnt/share

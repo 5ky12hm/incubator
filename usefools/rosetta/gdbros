@@ -1,0 +1,14 @@
+#!/usr/bin/env zsh
+
+if [ "$#" != "1" ]; then
+	echo "Usage: $0 <ELF-filepath>" >&2
+	exit 1
+fi
+prog="$1"
+
+ROSETTA_DEBUGSERVER_PORT=1234 "$prog" &
+
+/usr/bin/env gdb \
+	-iex "set architecture i386:x86-64" \
+	-iex "file $prog" \
+	-iex "target remote localhost:1234"
