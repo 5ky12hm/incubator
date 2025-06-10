@@ -1,0 +1,14 @@
+#!/usr/bin/env zsh
+
+if [ "$#" != "1" ]; then
+	echo "Usage: $0 <ELF-filepath>" >&2
+	exit 1
+fi
+prog="$1"
+
+qemu-x86_64-static -g 1234 "$prog" &
+
+/usr/bin/env pwndbg \
+	-iex "set architecture i386:x86-64" \
+	-iex "file $prog" \
+	-iex "target remote localhost:1234"
