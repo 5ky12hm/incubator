@@ -19,14 +19,15 @@ services:
 
         apt-get -y install zsh &&
 
-        # commented out: cannot pwndbg with rosetta debug server
-        # apt-get -y install gdb curl wget xz-utils &&
-        # curl -qsL "https://install.pwndbg.re" | sh -s -- -t pwndbg-gdb &&
-
         apt-get -y install gdb &&
+        echo 0 > /proc/sys/kernel/yama/ptrace_scope &&
+
+        # commented out: cannot pwndbg with rosetta debug server
+        apt-get -y install qemu-user-static curl wget xz-utils &&
+        curl -qsL "https://install.pwndbg.re" | sh -s -- -t pwndbg-gdb &&
+
         # commented out: cannot gef with rosetta debug server
         # apt-get -y install python3 binutils file procps &&
-        echo 0 > /proc/sys/kernel/yama/ptrace_scope &&
 
         apt-get -y install binutils file procps gcc &&
 
