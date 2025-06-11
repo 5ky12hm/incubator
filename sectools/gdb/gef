@@ -8,7 +8,11 @@ prog="$1"
 
 qemu-x86_64-static -g 1234 "$prog" &
 
-/usr/bin/env pwndbg \
+# /usr/bin/env pwndbg \
+	# -iex "set architecture i386:x86-64" \
+	# -iex "file $prog" \
+	# -iex "target remote localhost:1234"
+gdb \
 	-iex "set architecture i386:x86-64" \
 	-iex "file $prog" \
-	-iex "target remote localhost:1234"
+	-iex "gef-remote --qemu-user localhost 1234"
