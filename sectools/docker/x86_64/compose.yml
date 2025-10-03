@@ -1,6 +1,7 @@
 services:
   debian:
-    image: debian:bookworm-slim
+    # image: debian:bookworm-slim
+    image: debian:latest
     platform: linux/x86_64
     container_name: debian
     privileged: true
@@ -15,10 +16,9 @@ services:
           apt-get -y update &&
           apt-get -y upgrade &&
 
-          groupadd -g 100 users -f &&
-          useradd -g users -u 1001 5ky12hm &&
-
           apt-get -y install \
+            sudo \
+            locales-all \
             zsh \
             git \
             curl \
@@ -34,7 +34,11 @@ services:
             python3-pip \
             python3-dev \
           &&
-            
+
+          groupadd -g 100 users -f &&
+          useradd -g users -G sudo -u 1001 5ky12hm &&
+          echo 5ky12hm:5ky12hm | /usr/sbin/chpasswd &&
+
           apt-get -y install gdb qemu-user-static &&
           echo 0 > /proc/sys/kernel/yama/ptrace_scope &&
 

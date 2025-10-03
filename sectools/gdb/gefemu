@@ -1,0 +1,45 @@
+#!/usr/bin/env zsh
+
+usage() {
+	echo "Usage: $(basename "${ZSH_SCRIPT}") [--input gdb-input-filepath] <elf-filepath> [elf-args...]" >&2
+	exit 1
+}
+
+input_filepath=""
+output_filepath=""
+
+ARGS=()
+while [[ ${#} -gt 0 ]]; do
+    case ${1} in
+		--input) shift; input_filepath=${1}; shift;;
+        --) shift;  ARGS+=("${@}"); set --;;
+        --*) usage;;
+        -*)
+            OPTIONS=${1}
+            for (( i=1; i<${#OPTIONS}; i++ )); do
+                case "-${OPTIONS:$i:1}" in
+                    *) usage;;
+                esac
+            done
+            unset OPTIONS; shift;;
+        *) ARGS+=("${1}"); shift;;
+    esac
+done
+set -- "${ARGS[@]}"
+unset ARGS
+
+if [[ ${#} -lt 1 ]]; then
+	usage
+fi
+prog=${1}; shift
+
+if [[ ${input_filepath} != "" ]]; then
+	qemu-x86_64-static -g 1234 ${prog} "${@}" < ${input_filepath} &
+else
+	qemu-x86_64-static -g 1234 ${prog} "${@}" &
+fi
+
+gdb \
+	-iex "set architecture i386:x86-64" \
+	-iex "file ${prog}" \
+	-iex "gef-remote --qemu-user localhost 1234"
