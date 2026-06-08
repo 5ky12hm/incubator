@@ -8,4 +8,8 @@ useful tools for mac
     ```
     % uv init transclip
     ```
+- create sshutm project
+    ```
+    % mkdir sshutm
+    ```
 

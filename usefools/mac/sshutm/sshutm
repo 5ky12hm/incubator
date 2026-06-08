@@ -1,0 +1,26 @@
+#!/usr/bin/env zsh -ue
+
+if [[ $# -eq 0 ]]; then
+	echo 'usage: $0 <name>' >&2
+	exit 1
+fi
+declare -r NAME=${1}
+
+if ! pgrep -x "UTM" > /dev/null; then
+	open -g -a UTM
+	sleep 3
+fi
+if [ $(utmctl status ${NAME}) != 'started' ]; then
+	utmctl start ${NAME}
+
+	retryCount=0
+	while ! nc -z -w 1 ${NAME}.local 22 >/dev/null 2>&1; do
+		if [ ${retryCount} -ge 30 ]; then
+			exit 1
+		fi
+		sleep 1
+		((++retryCount))
+	done
+fi
+ssh -o 'ConnectTimeout=10' ${NAME}
+
